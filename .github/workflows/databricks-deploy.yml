@@ -26,15 +26,14 @@ jobs:
           pip install --upgrade pip
           pip install databricks-cli
 
-      - name: Configure Databricks CLI
+      - name: Configure databricks CLI (clean token)
         run: |
-          cat > ~/.databrickscfg <<EOF
+          TOKEN_CLEAN="$(printf '%s' "$DATABRICKS_TOKEN" | tr -d '\r\n')"
+          cat > /home/runner/.databrickscfg <<EOF
           [DEFAULT]
-          host=${DATABRICKS_HOST}
-          token=${DATABRICKS_TOKEN}
+          host = ${DATABRICKS_HOST}
+          token = ${TOKEN_CLEAN}
           EOF
-          databricks --version
-          cat /home/runner/.databrickscfg
           
       - name: Upload all .py files in repo root
         run: |
