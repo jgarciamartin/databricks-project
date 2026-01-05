@@ -34,7 +34,14 @@ jobs:
           token = ${DATABRICKS_TOKEN}
           EOF
           databricks --version
-
+          
+      - name: Debug workspace files
+        run: |
+          pwd
+          ls -la
+          ls -la databricks-project || true
+          find . -maxdepth 3 -type f -name "main.py" -print
+          
       - name: Upload python script to DBFS
         run: |
           databricks fs cp databricks-project/main.py dbfs:/FileStore/scripts/main.py --overwrite
