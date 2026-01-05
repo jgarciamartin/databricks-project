@@ -16,25 +16,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Databricks CLI (legacy)
+      - name: Install Databricks CLI (modern)
         run: |
-          pip install --upgrade pip
-          pip install databricks-cli
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+          databricks version
 
-      - name: Configure databricks CLI (clean token)
+      - name: Normalize env (host/token)
         run: |
-          TOKEN_CLEAN="$(printf '%s' "$DATABRICKS_TOKEN" | tr -d '\r\n')"
-          cat > /home/runner/.databrickscfg <<EOF
-          [DEFAULT]
-          host = ${DATABRICKS_HOST}
-          token = ${TOKEN_CLEAN}
-          EOF
-          
+          # Remove trailing slash from host and CR/LF from token
+          echo "DATABRICKS_HOST=${DATABRICKS_HOST%/}" >> $GITHUB_ENV
+          echo "DATABRICKS_TOKEN=$(printf '%s' "$DATABRICKS_TOKEN" | tr -d '\r\n')" >> $GITHUB_ENV
+
+      - name: Smoke test Databricks auth
+        run: |
+          databricks current-user me
+          databricks fs ls dbfs:/
+
       - name: Upload all .py files in repo root
         run: |
           databricks fs mkdirs dbfs:/FileStore/scripts
