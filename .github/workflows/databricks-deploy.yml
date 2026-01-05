@@ -34,7 +34,7 @@ jobs:
           token=${DATABRICKS_TOKEN}
           EOF
           databricks --version
-          ls -la
+          ls -la /home/runner/.databrickscfg || echo "File not found"
           
       - name: Upload all .py files in repo root
         run: |
