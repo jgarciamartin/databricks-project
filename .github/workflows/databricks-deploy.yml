@@ -35,16 +35,13 @@ jobs:
           EOF
           databricks --version
           
-      - name: Debug workspace files
+      - name: Upload all .py files in repo root
         run: |
-          pwd
-          ls -la
-          ls -la databricks-project || true
-          find . -maxdepth 3 -type f -name "main.py" -print
-          
-      - name: Upload python script to DBFS
-        run: |
-          databricks fs cp databricks-project/main.py dbfs:/FileStore/scripts/main.py --overwrite
+          databricks fs mkdirs dbfs:/FileStore/scripts
+          for f in ./*.py; do
+            [ -f "$f" ] || continue
+            databricks fs cp "$f" "dbfs:/FileStore/scripts/$(basename "$f")" --overwrite
+          done
 
       - name: List DBFS target (debug)
         run: |
