@@ -34,12 +34,12 @@ jobs:
 
       - name: Upload all .py files in repo root
         run: |
-          databricks fs mkdirs dbfs:/FileStore/scripts
+          databricks fs mkdirs dbfs:/Volumes/adbs/default/dbfs/scripts
           for f in ./*.py; do
             [ -f "$f" ] || continue
-            databricks fs cp "$f" "dbfs:/FileStore/scripts/$(basename "$f")" --overwrite
+            databricks fs cp "$f" "dbfs:/Volumes/adbs/default/dbfs/scripts/$(basename "$f")" --overwrite
           done
 
       - name: List DBFS target (debug)
         run: |
-          databricks fs ls dbfs:/FileStore/scripts/
+          databricks fs ls dbfs:/Volumes/adbs/default/dbfs/scripts/
